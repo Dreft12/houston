@@ -55,7 +55,6 @@ module Houston
           _command, status, index = error.unpack('ccN')
           notification.apns_error_code = status
           notification.mark_as_unsent!
-          connection.close
         end
       end
     end
