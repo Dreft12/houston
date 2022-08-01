@@ -36,13 +36,9 @@ module Houston
       return if notifications.empty?
 
       notifications.flatten!
-
-      @new_uri = @gateway_uri + notifications.first.token
-      puts @new_uri
-      Connection.open(@gateway_uri, @certificate, @passphrase) do |connection|
-        ssl = connection.ssl
-
-        notifications.each_with_index do |notification, index|
+      notifications.each_with_index do |notification, index|
+        Connection.open(@gateway_uri + notification.token, @certificate, @passphrase) do |connection|
+          ssl = connection.ssl
           next unless notification.is_a?(Notification)
           next if notification.sent?
           next unless notification.valid?
@@ -59,6 +55,7 @@ module Houston
           _command, status, index = error.unpack('ccN')
           notification.apns_error_code = status
           notification.mark_as_unsent!
+          connection.close
         end
       end
     end
