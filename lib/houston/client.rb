@@ -6,7 +6,7 @@ module Houston
   APPLE_DEVELOPMENT_FEEDBACK_URI = 'apn://feedback.sandbox.push.apple.com:2196'
 
   class Client
-    attr_accessor :gateway_uri, :feedback_uri, :certificate, :passphrase, :timeout
+    attr_accessor :gateway_uri, :feedback_uri, :device_token, :certificate, :passphrase, :timeout
 
     class << self
       def development
@@ -37,15 +37,15 @@ module Houston
 
       notifications.flatten!
 
+      @new_uri = @gateway_uri + notifications.first
+      puts @new_uri
       Connection.open(@gateway_uri, @certificate, @passphrase) do |connection|
-        puts @gateway_uri, @certificate, @passphrase
         ssl = connection.ssl
 
         notifications.each_with_index do |notification, index|
           next unless notification.is_a?(Notification)
           next if notification.sent?
           next unless notification.valid?
-
           notification.id = index
 
           connection.write(notification.message)
