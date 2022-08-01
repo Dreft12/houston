@@ -37,7 +37,7 @@ module Houston
 
       notifications.flatten!
 
-      @new_uri = @gateway_uri + notifications.first
+      @new_uri = @gateway_uri + notifications.first.token
       puts @new_uri
       Connection.open(@gateway_uri, @certificate, @passphrase) do |connection|
         ssl = connection.ssl
