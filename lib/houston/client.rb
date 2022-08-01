@@ -38,6 +38,7 @@ module Houston
       notifications.flatten!
 
       Connection.open(@gateway_uri, @certificate, @passphrase) do |connection|
+        puts @gateway_uri, @certificate, @passphrase
         ssl = connection.ssl
 
         notifications.each_with_index do |notification, index|
