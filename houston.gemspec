@@ -14,6 +14,8 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'commander', '4.4'
   s.add_dependency 'json'
+  s.add_dependency 'faraday'
+  s.add_dependency 'net-http2'
 
   s.add_development_dependency 'rake'
   s.add_development_dependency 'rspec', '~> 3.8'

@@ -2,6 +2,7 @@ require 'uri'
 require 'socket'
 require 'openssl'
 require 'forwardable'
+require 'net-http2'
 
 module Houston
   class Connection
@@ -17,7 +18,6 @@ module Houston
 
         connection = new(uri, certificate, passphrase)
         connection.open
-
         yield connection
 
         connection.close
@@ -28,34 +28,47 @@ module Houston
       @uri = URI(uri)
       @certificate = certificate.to_s
       @passphrase = passphrase.to_s unless passphrase.nil?
+      @device_token = ""
     end
 
     def open
       return false if open?
 
-      @socket = TCPSocket.new(@uri.host, @uri.port)
-
       context = OpenSSL::SSL::SSLContext.new
       context.key = OpenSSL::PKey::RSA.new(@certificate, @passphrase)
       context.cert = OpenSSL::X509::Certificate.new(@certificate)
 
-      @ssl = OpenSSL::SSL::SSLSocket.new(@socket, context)
-      @ssl.sync = true
-      @ssl.connect
+      client = NetHttp2::Client.new(@uri.to_s, ssl_context: context)
+
+      request = client.prepare_request(:post, "/3/device/#{@device_token}", headers: { 'Apns-Topic' => 'com.lifelinea.mysaic.mobile', 'Apns-Expiration' => '1', 'Apns-Priority' => '10' }, body: JSON.dump({
+                                                                                                                                                                                                "aps" => {
+                                                                                                                                                                                                  "alert" => "al fin sirve esta porqueria",
+                                                                                                                                                                                                  "sound" => "default"
+                                                                                                                                                                                                }
+                                                                                                                                                                                              }))
+      request.on(:headers) { |headers| p headers }
+      request.on(:body_chunk) { |chunk| p chunk }
+      request.on(:close) { puts "request completed!" }
+      # read the response
+
+      client.call_async(request)
+      client.on(:error) { |exception| puts "Exception has been raised: #{exception}" }
+      client.join(timeout: 5)
     end
 
     def open?
-      !(@ssl && @socket).nil?
+      !(@conn).nil?
+    end
+
+    def set_token (device_token)
+      @device_token = device_token
     end
 
     def close
       return false if closed?
 
-      @ssl.close
-      @ssl = nil
-
-      @socket.close
-      @socket = nil
+      @conn.close
+      @conn = nil
     end
 
     def closed?

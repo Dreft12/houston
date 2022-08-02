@@ -2,7 +2,7 @@ module Houston
   APPLE_PRODUCTION_GATEWAY_URI = 'apn://gateway.push.apple.com:2195'
   APPLE_PRODUCTION_FEEDBACK_URI = 'apn://feedback.push.apple.com:2196'
 
-  APPLE_DEVELOPMENT_GATEWAY_URI = 'https://api.sandbox.push.apple.com/3/device/'
+  APPLE_DEVELOPMENT_GATEWAY_URI = 'https://api.development.push.apple.com/'
   APPLE_DEVELOPMENT_FEEDBACK_URI = 'apn://feedback.sandbox.push.apple.com:2196'
 
   class Client
@@ -36,8 +36,15 @@ module Houston
       return if notifications.empty?
 
       notifications.flatten!
-      notifications.each_with_index do |notification, index|
-        Connection.open(@gateway_uri + notification.token, @certificate, @passphrase) do |connection|
+      Connection.open(@gateway_uri, @certificate, @passphrase) do |connection|
+        notifications.each_with_index do |notification, index|
+
+          next unless notification.is_a?(Notification)
+          next if notification.sent?
+          notification.id = index
+          connection.set_token notification.token
+          connection.open
+=begin
           ssl = connection.ssl
           next unless notification.is_a?(Notification)
           next if notification.sent?
@@ -55,6 +62,7 @@ module Houston
           _command, status, index = error.unpack('ccN')
           notification.apns_error_code = status
           notification.mark_as_unsent!
+=end
         end
       end
     end

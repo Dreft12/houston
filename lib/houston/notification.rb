@@ -78,7 +78,6 @@ module Houston
       json['aps']['thread-id'] = @thread_id if @thread_id
 
       json
-      puts json
     end
 
     def message
