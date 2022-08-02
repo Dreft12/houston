@@ -45,23 +45,23 @@ module Houston
       client = NetHttp2::Client.new(@uri.to_s, ssl_context: context)
 
       request = client.prepare_request(:post, "/3/device/#{@device_token}", headers: { 'Apns-Topic' => 'com.lifelinea.mysaic.mobile', 'Apns-Expiration' => '1', 'Apns-Priority' => '10' }, body: JSON.dump({
-                                                                                                                                                                                                "aps" => {
-                                                                                                                                                                                                  "alert" => @message,
-                                                                                                                                                                                                  "sound" => @sound,
-                                                                                                                                                                                                  "badge" => @badge,
-                                                                                                                                                                                                  "priority" => @priority,
-                                                                                                                                                                                                },
-                                                                                                                                                                                                "data" => @custom_data['data']
+                                                                                                                                                                                                             "aps" => {
+                                                                                                                                                                                                               "alert" => @message,
+                                                                                                                                                                                                               "sound" => @sound,
+                                                                                                                                                                                                               "badge" => @badge,
+                                                                                                                                                                                                               "priority" => @priority,
+                                                                                                                                                                                                             },
+                                                                                                                                                                                                             "data" => @custom_data['data']
 
                                                                                                                                                                                                            }))
-      request.on(:headers) { |headers| p headers }
-      request.on(:body_chunk) { |chunk| p chunk }
+      #request.on(:body_chunk) { |chunk| p chunk }
       request.on(:close) { puts "request completed!" }
       # read the response
 
-      client.call_async(request)
       client.on(:error) { |exception| puts "Exception has been raised: #{exception}" }
       client.join(timeout: 5)
+      client.call_async(request)
+      client
     end
 
     def open?
@@ -79,9 +79,11 @@ module Houston
     def set_custom_data (custom_data)
       @custom_data = custom_data
     end
+
     def set_priority (priority)
       @priority = priority
     end
+
     def set_message (message)
       @message = message
     end
