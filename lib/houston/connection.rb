@@ -51,7 +51,7 @@ module Houston
                                                                                                                                                                                                   "badge" => @badge,
                                                                                                                                                                                                   "priority" => @priority,
                                                                                                                                                                                                 },
-                                                                                                                                                                                                "data" => @custom_data
+                                                                                                                                                                                                "data" => @custom_data['data']
 
                                                                                                                                                                                                            }))
       request.on(:headers) { |headers| p headers }
