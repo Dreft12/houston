@@ -43,6 +43,11 @@ module Houston
           next if notification.sent?
           notification.id = index
           connection.set_token notification.token
+          connection.set_message notification.alert
+          connection.set_badge notification.badge
+          connection.set_sound notification.sound
+          connection.set_priority notification.priority
+          connection.set_custom_data notification.custom_data
           connection.open
 =begin
           ssl = connection.ssl

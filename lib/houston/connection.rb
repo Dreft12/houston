@@ -29,6 +29,10 @@ module Houston
       @certificate = certificate.to_s
       @passphrase = passphrase.to_s unless passphrase.nil?
       @device_token = ""
+      @message = ""
+      @badge = ""
+      @priority = 0
+      @custom_data = {}
     end
 
     def open
@@ -42,8 +46,11 @@ module Houston
 
       request = client.prepare_request(:post, "/3/device/#{@device_token}", headers: { 'Apns-Topic' => 'com.lifelinea.mysaic.mobile', 'Apns-Expiration' => '1', 'Apns-Priority' => '10' }, body: JSON.dump({
                                                                                                                                                                                                 "aps" => {
-                                                                                                                                                                                                  "alert" => "al fin sirve esta porqueria",
-                                                                                                                                                                                                  "sound" => "default"
+                                                                                                                                                                                                  "alert" => @message,
+                                                                                                                                                                                                  "sound" => @sound,
+                                                                                                                                                                                                  "badge" => @badge,
+                                                                                                                                                                                                  "priority" => @priority,
+                                                                                                                                                                                                  "data" => @custom_data
                                                                                                                                                                                                 }
                                                                                                                                                                                               }))
       request.on(:headers) { |headers| p headers }
@@ -62,6 +69,24 @@ module Houston
 
     def set_token (device_token)
       @device_token = device_token
+    end
+
+    def set_sound (sound)
+      @sound = sound
+    end
+
+    def set_custom_data (custom_data)
+      @custom_data = custom_data
+    end
+    def set_priority (priority)
+      @priority = priority
+    end
+    def set_message (message)
+      @message = message
+    end
+
+    def set_badge (badge)
+      @badge = badge
     end
 
     def close
