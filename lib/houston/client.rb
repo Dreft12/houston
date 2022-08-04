@@ -30,9 +30,8 @@ module Houston
       return if notifications.empty?
 
       notifications.flatten!
-      Connection.open(@gateway_uri, @certificate, @passphrase) do |connection|
-        notifications.each_with_index do |notification, index|
-
+      notifications.each_with_index do |notification, index|
+        Connection.open(@gateway_uri, @certificate, @passphrase) do |connection|
           next unless notification.is_a?(Notification)
           next if notification.sent?
           notification.id = index

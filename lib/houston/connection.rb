@@ -54,7 +54,7 @@ module Houston
                                                                                                                                                                                                              "data" => @custom_data['data']
 
                                                                                                                                                                                                            }))
-      #request.on(:body_chunk) { |chunk| p chunk }
+      request.on(:body_chunk) { |chunk| p chunk }
       request.on(:close) { puts "request completed!" }
       # read the response
 
