@@ -36,7 +36,7 @@ module Houston
     end
 
     def open
-      return false if open?
+      return false if @device_token.empty?
 
       context = OpenSSL::SSL::SSLContext.new
       context.key = OpenSSL::PKey::RSA.new(@certificate, @passphrase)
@@ -57,11 +57,10 @@ module Houston
       request.on(:body_chunk) { |chunk| p chunk }
       request.on(:close) { puts "request completed!" }
       # read the response
-
+      p request.uri + request.full_path
+      client.call_async(request)
       client.on(:error) { |exception| puts "Exception has been raised: #{exception}" }
       client.join(timeout: 5)
-      client.call_async(request)
-      client
     end
 
     def open?

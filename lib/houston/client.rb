@@ -1,6 +1,6 @@
 module Houston
-  APPLE_PRODUCTION_GATEWAY_URI = 'https://api.push.apple.com/'
-  APPLE_DEVELOPMENT_GATEWAY_URI = 'https://api.development.push.apple.com/'
+  APPLE_PRODUCTION_GATEWAY_URI = 'https://api.push.apple.com'
+  APPLE_DEVELOPMENT_GATEWAY_URI = 'https://api.development.push.apple.com'
 
   class Client
     attr_accessor :gateway_uri, :feedback_uri, :device_token, :certificate, :passphrase, :timeout
@@ -30,8 +30,8 @@ module Houston
       return if notifications.empty?
 
       notifications.flatten!
-      notifications.each_with_index do |notification, index|
-        Connection.open(@gateway_uri, @certificate, @passphrase) do |connection|
+      Connection.open(@gateway_uri, @certificate, @passphrase) do |connection|
+        notifications.each_with_index do |notification, index|
           next unless notification.is_a?(Notification)
           next if notification.sent?
           notification.id = index
